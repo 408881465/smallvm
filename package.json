@@ -1,0 +1,30 @@
+{
+  "name": "microblocks-android",
+  "version": "1.0.0",
+  "description": "MicroBlocks Android App based on Capacitor",
+  "type": "module",
+  "scripts": {
+    "start": "vite",
+    "prebuild": "node scripts/prebuild.js",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@capacitor-community/bluetooth-le": "^6.0.2",
+    "@capacitor/android": "^6.1.2",
+    "@capacitor/app": "^6.0.3",
+    "@capacitor/camera": "latest",
+    "@capacitor/core": "latest",
+    "@capacitor/filesystem": "^6.0.0",
+    "@capacitor/haptics": "^6.0.3",
+    "@capacitor/ios": "^6.1.2",
+    "@capacitor/splash-screen": "latest",
+    "@capacitor/status-bar": "^6.0.1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "latest",
+    "vite": "^5.4.2"
+  },
+  "author": "",
+  "license": "MPL-2.0"
+}

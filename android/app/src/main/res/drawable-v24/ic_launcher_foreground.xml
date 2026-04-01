@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Bunny icon placeholder -->
+    <group android:scaleX="0.5"
+        android:scaleY="0.5"
+        android:pivotX="54"
+        android:pivotY="54">
+        <path
+            android:fillColor="#BDD72E"
+            android:pathData="M54,20 C35,20 20,35 20,54 C20,73 35,88 54,88 C73,88 88,73 88,54 C88,35 73,20 54,20 Z M54,30 C60,30 65,35 65,41 C65,47 60,52 54,52 C48,52 43,47 43,41 C43,35 48,30 54,30 Z M40,65 L40,75 L50,75 L50,65 Z M58,65 L58,75 L68,75 L68,65 Z"/>
+    </group>
+</vector>

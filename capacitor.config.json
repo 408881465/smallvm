@@ -1,0 +1,14 @@
+{
+  "appId": "com.microblocks.fun",
+  "appName": "MicroBlocks",
+  "webDir": "dist",
+  "loggingBehavior": "none",
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 0
+    },
+    "Filesystem": {
+      "androidDisplayName": "MicroBlocks Files"
+    }
+  }
+}
