@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">MicroBlocks</string>
-    <string name="title_activity_main">MicroBlocks</string>
-    <string name="package_name">com.microblocks.fun</string>
-    <string name="custom_url_scheme">com.microblocks.fun</string>
+    <string name="app_name">CoCube</string>
+    <string name="title_activity_main">CoCube</string>
+    <string name="package_name">com.cocuberobot.mb</string>
+    <string name="custom_url_scheme">com.cocuberobot.mb</string>
 </resources>

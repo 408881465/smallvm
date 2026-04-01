@@ -1,4 +1,4 @@
-package com.microblocks.fun;
+package com.cocuberobot.mb;
 
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -30,7 +30,7 @@ public class MainActivity extends BridgeActivity {
 
     /**
      * 判断是否为平板设备
-     * 方法: 使用最小屏幕宽度判断（推荐）
+     * 方法1: 使用最小屏幕宽度判断（推荐）
      */
     private boolean isTablet() {
         // 平板通常最小宽度 >= 600dp
@@ -44,7 +44,7 @@ public class MainActivity extends BridgeActivity {
     private boolean isTabletAlternative() {
         int screenLayout = getResources().getConfiguration().screenLayout;
         screenLayout &= Configuration.SCREENLAYOUT_SIZE_MASK;
-
+        
         return screenLayout == Configuration.SCREENLAYOUT_SIZE_LARGE ||
                screenLayout == Configuration.SCREENLAYOUT_SIZE_XLARGE;
     }

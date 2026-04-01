@@ -1,6 +1,6 @@
 {
-  "appId": "com.microblocks.fun",
-  "appName": "MicroBlocks",
+  "appId": "com.cocuberobot.mb",
+  "appName": "CoCube",
   "webDir": "dist",
   "loggingBehavior": "none",
   "plugins": {
@@ -8,7 +8,7 @@
       "launchShowDuration": 0
     },
     "Filesystem": {
-      "androidDisplayName": "MicroBlocks Files"
+      "androidDisplayName": "CoCube Files"
     }
   }
 }

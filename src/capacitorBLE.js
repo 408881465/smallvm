@@ -19,11 +19,9 @@ class CapacitorBLESerial {
     }
 
     async initialize() {
-        // Get BleClient from Capacitor Plugins (registered by native layer)
-        this.bleClient = window.Capacitor.Plugins.BluetoothLe;
-        if (this.bleClient) {
-            await this.bleClient.initialize();
-        }
+        // Get BleClient from Capacitor
+        this.bleClient = BleClient;
+        await this.bleClient.initialize();
     }
 
 

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en-us">
 	<head>
 		<title>MicroBlocks</title>
@@ -27,6 +27,7 @@
 
 			.emscripten { padding-right: 0; margin-left: auto; margin-right: auto; display: block; }
 			div.emscripten { text-align: center; }
+			/* the canvas *must not* have any border or padding, or mouse coords will be wrong */
 			canvas.emscripten { border: 0px none; margin-left: 0px; margin-top: -18px }
 
 			.spinner {
@@ -105,6 +106,10 @@
 		</style>
 	</head>
 	<body>
+	<script>
+		// Force HTTPS. Otherwise WebSerial can't be accessed.
+		// if (location.protocol === 'http:') { location.protocol = 'https:'; }
+	</script>
 	<span id='controls' style="display: none">
 		<input type="button" value="Keyboard" id="KeyboardButton">
 		<input type="button" value="Backspace" id="BackspaceButton">
@@ -129,11 +134,10 @@
 			<canvas class="emscripten" id="canvas" width="100px" height="100px"></canvas>
 		</div>
 
-    <script type="text/javascript" src="emModule.js"></script>
-    <script type="module" src="capacitorBLE.js"></script>
-    <script type="text/javascript" src="gpSupport.js"></script>
-    <script type="text/javascript" src="microblocksCN.js"></script>
-    <script type="text/javascript" src="FileSaver.js"></script>
-    <script type="text/javascript" src="gp_wasm.js?version=2-0-49-5"></script>
-  </body>
+		<script type="text/javascript" src="emModule.js"></script>
+		<script type="text/javascript" src="gpSupport.js"></script>
+		<script type="text/javascript" src="FileSaver.js"></script>
+		<script type="text/javascript" src="gp_wasm.js"></script>
+
+	</body>
 </html>

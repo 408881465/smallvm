@@ -1,8 +1,8 @@
-// Handlers are ignored in gp.html when running as a Chrome App so must be added here:
-
 function isCapacitorEnvironment() {
 	return typeof window.Capacitor !== 'undefined';
 }
+
+// Handlers are ignored in gp.html when running as a Chrome App so must be added here:
 
 function addGPHandlers() {
 	var kbdButton = document.getElementById('KeyboardButton');
@@ -57,6 +57,8 @@ var GP = {
 	audioInReady: false,
 	audioInSource: null,
 	audioInCapture: null,
+
+	defaultEditText: '',
 };
 
 // Add the following to the meta tags in the header to suppress scaling of the GP canvas
@@ -88,7 +90,7 @@ function setGPClipboard(s) {
 	GP.clipboard.value = s;
 
 	if ((typeof navigator.clipboard !== 'undefined') && (navigator.clipboard.writeText)) {
-		navigator.clipboard.writeText(s).catch(() => {});
+		navigator.clipboard.writeText(s).catch(() => { });
 	} else {
 		GP.clipboard.focus();
 		GP.clipboard.select();
@@ -102,7 +104,7 @@ function setGPClipboard(s) {
 
 async function readGPClipboard(s) {
 	if ((typeof navigator.clipboard !== 'undefined') && (navigator.clipboard.readText)) {
-		var s = await navigator.clipboard.readText().catch(() => {});
+		var s = await navigator.clipboard.readText().catch(() => { });
 		if (s) GP.clipboard.value = s;
 	} else {
 		GP.clipboard.focus();
@@ -174,10 +176,10 @@ function initGPEventHandlers() {
 	}
 	function modifierBits(evt) {
 		var modifiers = ( // SDL modifier flags (for left-side versions of those keys)
-		(evt.shiftKey ? 1 : 0) |
-		(evt.ctrlKey ? 2 : 0) |
-		(evt.altKey ? 4 : 0) |
-		(evt.metaKey ? 8 : 0));
+			(evt.shiftKey ? 1 : 0) |
+			(evt.ctrlKey ? 2 : 0) |
+			(evt.altKey ? 4 : 0) |
+			(evt.metaKey ? 8 : 0));
 		return modifiers;
 	}
 	function keyEvent(evtType, evt) {
@@ -218,20 +220,20 @@ function initGPEventHandlers() {
 
 	var canvas = document.getElementById('canvas');
 
-	canvas.onmousedown = function(evt) {
+	canvas.onmousedown = function (evt) {
 		evt.preventDefault();
 		var p = localPoint(evt.clientX, evt.clientY, 0);
 		GP.events.push([MOUSE_DOWN, p[0], p[1], evt.button, modifierBits(evt)]);
 	}
-	canvas.onmouseup = function(evt) {
+	canvas.onmouseup = function (evt) {
 		var p = localPoint(evt.clientX, evt.clientY, 0);
 		GP.events.push([MOUSE_UP, p[0], p[1], evt.button, modifierBits(evt)]);
 	}
-	canvas.onmousemove = function(evt) {
+	canvas.onmousemove = function (evt) {
 		var p = localPoint(evt.clientX, evt.clientY, 0);
 		GP.events.push([MOUSE_MOVE, p[0], p[1]]);
 	}
-	document.onkeydown = function(evt) {
+	document.onkeydown = function (evt) {
 		var key = evt.which;
 		if ((13 == key) && (/Android/i.test(navigator.userAgent))) {
 			// On Android, generate text input events for entire string when the enter key is pressed
@@ -267,10 +269,10 @@ function initGPEventHandlers() {
 			}
 		}
 	}
-	document.onkeyup = function(evt) {
+	document.onkeyup = function (evt) {
 		GP.events.push(keyEvent(KEY_UP, evt));
 	}
-	document.onkeypress = function(evt) {
+	document.onkeypress = function (evt) {
 		var charCode = evt.charCode;
 		if (13 == charCode) return; // don't report a text input event for cr/enter
 		if (evt.char && (evt.char.length == 1)) charCode = evt.char.codePointAt(0);
@@ -278,27 +280,27 @@ function initGPEventHandlers() {
 	}
 
 	// IME composition events
-	document.addEventListener('compositionstart', function(evt) {
+	document.addEventListener('compositionstart', function (evt) {
 		GP.compositionText = '';
 	});
-	document.addEventListener('compositionupdate', function(evt) {
+	document.addEventListener('compositionupdate', function (evt) {
 		GP.compositionText = evt.data;
 	});
-	document.addEventListener('compositionend', function(evt) {
+	document.addEventListener('compositionend', function (evt) {
 		for (let ch of GP.compositionText) {
 			GP.events.push([TEXTINPUT, ch.codePointAt(0)]);
 		}
 		GP.compositionText = '';
 	});
 
-	canvas.onwheel = function(evt) {
+	canvas.onwheel = function (evt) {
 		if (evt.shiftKey || evt.ctrlKey) { return; } // default behavior (browser zoom)
 		var dx = evt.wheelDeltaX;
 		var dy = evt.wheelDeltaY;
 		GP.events.push([MOUSE_WHEEL, dx, dy]);
 		evt.preventDefault();
 	}
-	canvas.ontouchstart = function(evt) {
+	canvas.ontouchstart = function (evt) {
 		var touch = evt.touches[0];
 		if (touch) {
 			// var button = (evt.touches.length == 2) ? 3 : 0; // did not work
@@ -309,7 +311,7 @@ function initGPEventHandlers() {
 		}
 		evt.preventDefault();
 	}
-	canvas.ontouchmove = function(evt) {
+	canvas.ontouchmove = function (evt) {
 		var touch = evt.touches[0];
 		if (touch) {
 			var p = localPoint(touch.clientX, touch.clientY, 10);
@@ -317,7 +319,7 @@ function initGPEventHandlers() {
 		}
 		evt.preventDefault();
 	}
-	canvas.ontouchend = function(evt) {
+	canvas.ontouchend = function (evt) {
 		var touch = evt.changedTouches[0];
 		if (touch) {
 			var p = localPoint(touch.clientX, touch.clientY, 10);
@@ -325,14 +327,312 @@ function initGPEventHandlers() {
 		}
 		evt.preventDefault();
 	}
-	canvas.ontouchcancel = function(evt) {
+	canvas.ontouchcancel = function (evt) {
 		GP.events.push([TOUCH_UP, 200, 200, 0]); // push a dummy touch_up event
 	}
-	window.onfocus = function(evt) {
+	window.onfocus = function (evt) {
 		GP.events.push([WINDOW_SHOWN]);
 	}
 }
 initGPEventHandlers();
+
+// add floating input
+function initFloatingInput() {
+    if (!isCapacitorEnvironment()) return;
+    
+    let floatingContainer = null;
+    let floatingInput = null;
+    let isFloatingInputActive = false;
+    
+    // 创建浮动输入 UI
+    function createFloatingUI() {
+        if (floatingContainer) return;
+        
+        // 检测系统语言
+        const isChinese = navigator.language.toLowerCase().startsWith('zh');
+        const labels = {
+            placeholder: isChinese ? '请输入...' : 'Enter text...',
+            confirm: isChinese ? '确认' : 'Confirm',
+            cancel: isChinese ? '取消' : 'Cancel'
+        };
+        
+        // 外层遮罩
+        const wrapper = document.createElement('div');
+        wrapper.id = 'floating-input-wrapper';
+        wrapper.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        `;
+        
+        // 输入框容器
+        const container = document.createElement('div');
+        container.style.cssText = `
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            min-width: 320px;
+            max-width: 90vw;
+            animation: slideUp 0.3s ease-out;
+        `;
+        
+        // 输入框
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.placeholder = labels.placeholder;
+        input.style.cssText = `
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            box-sizing: border-box;
+            outline: none;
+            -webkit-appearance: none;
+        `;
+        
+        // 按钮容器
+        const btnContainer = document.createElement('div');
+        btnContainer.style.cssText = `
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        `;
+        
+        // 取消按钮
+        const cancelBtn = document.createElement('button');
+        cancelBtn.textContent = labels.cancel;
+        cancelBtn.style.cssText = `
+            flex: 1;
+            padding: 12px;
+            font-size: 16px;
+            background: #f5f5f5;
+            color: #666;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            -webkit-tap-highlight-color: transparent;
+        `;
+        
+        // 确认按钮
+        const confirmBtn = document.createElement('button');
+        confirmBtn.textContent = labels.confirm;
+        confirmBtn.style.cssText = `
+            flex: 1;
+            padding: 12px;
+            font-size: 16px;
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            -webkit-tap-highlight-color: transparent;
+        `;
+        
+        // 添加动画
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideUp {
+                from { opacity: 0; transform: translateY(30px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // 组装 DOM
+        btnContainer.appendChild(cancelBtn);
+        btnContainer.appendChild(confirmBtn);
+        container.appendChild(input);
+        container.appendChild(btnContainer);
+        wrapper.appendChild(container);
+        document.body.appendChild(wrapper);
+        
+        floatingContainer = wrapper;
+        floatingInput = input;
+        
+        // 绑定事件
+        confirmBtn.onclick = () => confirmFloatingInput();
+        cancelBtn.onclick = () => cancelFloatingInput();
+        
+        // 修复退格键问题 - 阻止事件冒泡
+        input.onkeydown = (e) => {
+            // 阻止事件冒泡到 document,避免被全局键盘处理器拦截
+            e.stopPropagation();
+            
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                confirmFloatingInput();
+            }
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                cancelFloatingInput();
+            }
+            // 其他按键(包括退格)允许默认行为
+        };
+        
+        // 防止点击遮罩关闭
+        wrapper.onclick = (e) => {
+            if (e.target === wrapper) cancelFloatingInput();
+        };
+        
+        // 防止按钮事件冒泡
+        confirmBtn.onclick = (e) => {
+            e.stopPropagation();
+            confirmFloatingInput();
+        };
+        cancelBtn.onclick = (e) => {
+            e.stopPropagation();
+            cancelFloatingInput();
+        };
+    }
+    
+    // 显示浮动输入框
+    function showFloatingInput() {
+        if (isFloatingInputActive) return;
+        
+        createFloatingUI();
+
+        
+        // 显示容器
+        floatingContainer.style.display = 'flex';
+        floatingInput.value = GP.defaultEditText;
+        
+        // 标记为激活状态
+        isFloatingInputActive = true;
+        
+        // 延迟聚焦,确保键盘正确弹出
+        setTimeout(() => {
+            floatingInput.focus();
+            floatingInput.select();
+            
+            // iOS 额外触发
+            if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+                floatingInput.click();
+            }
+        }, 100);
+        
+        // 阻止原生 clipboard 获得焦点
+        GP.clipboard.blur();
+    }
+    
+    // 确认输入
+	function confirmFloatingInput() {
+		if (!isFloatingInputActive) return;
+		
+		const value = floatingInput.value;
+		
+		// 1. 先清空原有内容(发送退格键删除所有字符)
+
+		const KEY_DOWN = 5;
+		const KEY_UP = 6;
+		
+		// 方案1: 发送 Ctrl+A 全选 + Delete
+		// 模拟 Ctrl+A (全选)
+		GP.events.push([KEY_DOWN, 17, 0, 2]); // Ctrl down (keyCode=17, modifiers=2)
+		GP.events.push([KEY_DOWN, 65, 97, 2]); // A down (keyCode=65, charCode=97)
+		GP.events.push([KEY_UP, 65, 97, 2]);   // A up
+		GP.events.push([KEY_UP, 17, 0, 2]);    // Ctrl up
+		
+		// 模拟 Delete/Backspace
+		GP.events.push([KEY_DOWN, 8, 8, 0]);   // Backspace down
+		GP.events.push([KEY_UP, 8, 8, 0]);     // Backspace up
+		
+		
+		// 2. 写入新内容
+		GP.clipboard.value = value;
+		
+		// 3. 生成新内容的 textinput 事件
+		const TEXTINPUT = 7;
+		if (/Android/i.test(navigator.userAgent)) {
+			// Android 特殊处理
+			for (let i = 0; i < value.length; i++) {
+				GP.events.push([TEXTINPUT, value.charCodeAt(i)]);
+			}
+			if (value.length === 0) {
+				GP.events.push([TEXTINPUT, 13]); // 空字符串插入换行符
+			}
+		} else {
+			// 其他平台
+			for (let ch of value) {
+				GP.events.push([TEXTINPUT, ch.codePointAt(0)]);
+			}
+		}
+		
+		hideFloatingInput();
+	}
+    // 取消输入
+    function cancelFloatingInput() {
+        if (!isFloatingInputActive) return;
+        hideFloatingInput();
+    }
+    
+    // 隐藏浮动输入框
+    function hideFloatingInput() {
+        if (!floatingContainer) return;
+        
+        floatingContainer.style.display = 'none';
+        floatingInput.blur();
+        isFloatingInputActive = false;
+        
+        // 将焦点返回给 canvas
+        document.getElementById('canvas').focus();
+    }
+    
+    // 拦截 GP.clipboard 的 focus 事件
+    GP.clipboard.addEventListener('focus', function(e) {
+        if (isCapacitorEnvironment() && !isFloatingInputActive) {
+            // 阻止默认行为
+            e.preventDefault();
+            
+            // 显示浮动输入框
+            showFloatingInput();
+        }
+    });
+    
+    // 监听键盘显示/隐藏(使用 Capacitor Keyboard 插件)
+    if (typeof window.Capacitor !== 'undefined' && window.Capacitor.Plugins.Keyboard) {
+        const { Keyboard } = window.Capacitor.Plugins;
+        
+        let keyboardHeight = 0;
+        
+        Keyboard.addListener('keyboardWillShow', (info) => {
+            keyboardHeight = info.keyboardHeight;
+            adjustFloatingInputPosition();
+        });
+        
+        Keyboard.addListener('keyboardWillHide', () => {
+            keyboardHeight = 0;
+            adjustFloatingInputPosition();
+        });
+        
+        function adjustFloatingInputPosition() {
+            if (!floatingContainer || !isFloatingInputActive) return;
+            
+            const container = floatingContainer.querySelector('div');
+            if (keyboardHeight > 0) {
+                // 向上移动,避免被键盘遮挡
+                container.style.transform = `translateY(-${keyboardHeight / 2}px)`;
+                container.style.transition = 'transform 0.3s ease-out';
+            } else {
+                container.style.transform = 'translateY(0)';
+            }
+        }
+        
+        // 配置键盘行为
+        Keyboard.setAccessoryBarVisible({ isVisible: true });
+        Keyboard.setScroll({ isDisabled: true });
+    }
+}
+initFloatingInput();
+
 
 function GP_backspace() {
 	// Simulate the backspace/delete key on Android.
@@ -346,7 +646,7 @@ function GP_backspace() {
 
 window.addEventListener(
 	'dragover',
-	function(evt) {
+	function (evt) {
 		evt.preventDefault();
 	},
 	false
@@ -354,7 +654,7 @@ window.addEventListener(
 
 window.addEventListener(
 	'drop',
-	function(evt) {
+	function (evt) {
 		evt.preventDefault();
 		var files = evt.target.files || evt.dataTransfer.files;
 		if (files && files.length) {
@@ -410,7 +710,7 @@ function handleMessage(evt) {
 				GP.boardie.files[msg[1]] = msg[2];
 				return;
 			case 'boardieDeleteFile':
-				delete(GP.boardie.files[msg[1]]);
+				delete (GP.boardie.files[msg[1]]);
 				return;
 			case 'boardieSoundStart':
 				boardie.element.querySelector('.audio').classList.add('--is-active');
@@ -442,7 +742,7 @@ function uploadFiles(files) {
 
 	function recordFile(f) {
 		reader = new FileReader();
-		reader.onloadend = function() {
+		reader.onloadend = function () {
 			if (reader.result) {
 				GP.droppedFiles.push({ name: toUTF8Array(f.name), contents: reader.result });
 			}
@@ -456,6 +756,13 @@ function uploadFiles(files) {
 		recordFile(todo.shift());
 	}
 }
+
+function forceFullDownload() {
+    // GP 收到 stop 消息会调用 stopAndSyncScripts
+    queueGPMessage('forceFullDownload');
+	console.log('Forcing full download of scripts from server.');
+}
+window.forceFullDownload = forceFullDownload;
 
 function adjustButtonVisibility() {
 	// Show the appropriate buttons in a mobile or non-mobile browser.
@@ -509,8 +816,7 @@ function adjustButtonVisibility() {
 		document.getElementById('PresentButton').style.display = 'inline';
 	}
 }
-// don't show keyboard button
-//adjustButtonVisibility();
+adjustButtonVisibility();
 
 // Canvas shadow effects
 
@@ -542,9 +848,9 @@ function GP_audioContext() {
 	// Note: Cache the audio context because browsers only allow you to create a few of them.
 	if (GP.cachedAudioContext) return GP.cachedAudioContext;
 
-	function unsuspendAudioContext () {
+	function unsuspendAudioContext() {
 		// On iOS, the audio context is suspended until resumed by a touch event.
-		if (GP.cachedAudioContext &&  ('suspended' === GP.cachedAudioContext.state)) {
+		if (GP.cachedAudioContext && ('suspended' === GP.cachedAudioContext.state)) {
 			GP.cachedAudioContext.resume();
 		}
 	}
@@ -604,7 +910,7 @@ function GP_startAudioInput(inputSampleCount, sampleRate) {
 	navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia ||
 		navigator.mozGetUserMedia || navigator.msGetUserMedia || navigator.oGetUserMedia;
 	if (navigator.getUserMedia) {
-		navigator.getUserMedia({audio: true}, openAudioInput, openAudioInputFailed);
+		navigator.getUserMedia({ audio: true }, openAudioInput, openAudioInputFailed);
 	} else {
 		console.warn('Audio input is not supported by this browser');
 	}
@@ -692,7 +998,7 @@ function GP_toggleFullscreen() {
 	var requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
 	var cancelFullScreen = doc.exitFullscreen || doc.mozCancelFullScreen || doc.webkitExitFullscreen || doc.msExitFullscreen;
 
-	if(!doc.fullscreenElement && !doc.mozFullScreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement) {
+	if (!doc.fullscreenElement && !doc.mozFullScreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement) {
 		requestFullScreen.call(docEl);
 	} else {
 		cancelFullScreen.call(doc);
@@ -712,11 +1018,11 @@ GP.boardie = {
 	position: null,
 	reset: function () {
 		win = this.iframe.contentWindow;
-		win.postMessage(new Uint8Array([ 0xFA, 0x0F, 3 ]), '*'); // system reset w/ Boardie option
+		win.postMessage(new Uint8Array([0xFA, 0x0F, 3]), '*'); // system reset w/ Boardie option
 		ctx = win.document.querySelector('canvas').getContext('2d');
 		ctx.fillStyle = "#000";
 		ctx.fillRect(0, 0, 240, 240); // clear screen
-		win.postMessage(new Uint8Array([ 0xFA, 0x05, 0 ]), '*'); // start all
+		win.postMessage(new Uint8Array([0xFA, 0x05, 0]), '*'); // start all
 	},
 	buttonForCode: function (keyCode) {
 		switch (parseInt(keyCode)) {
@@ -735,7 +1041,7 @@ GP.boardie = {
 	files: {},
 	press: function (keyCode, andSendToBoard) {
 		var button = this.buttonForCode(keyCode),
-				element = this.element.querySelector(`[data-button="${button}"]`);
+			element = this.element.querySelector(`[data-button="${button}"]`);
 		if (element) { element.classList.add('--is-active'); }
 		if (andSendToBoard) {
 			this.iframe.contentWindow.postMessage(['keyDown', keyCode], '*');
@@ -743,7 +1049,7 @@ GP.boardie = {
 	},
 	unpress: function (keyCode, andSendToBoard) {
 		var button = this.buttonForCode(keyCode);
-				element = this.element.querySelector(`[data-button="${button}"]`);
+		element = this.element.querySelector(`[data-button="${button}"]`);
 		if (element) { element.classList.remove('--is-active'); }
 		if (andSendToBoard) {
 			this.iframe.contentWindow.postMessage(['keyUp', keyCode], '*');
@@ -753,7 +1059,7 @@ GP.boardie = {
 
 function GP_openBoardie() {
 	var req = new XMLHttpRequest();
-		boardie = GP.boardie;
+	boardie = GP.boardie;
 
 	GP_closeSerialPort(); // close serial port if open
 	GP.boardie.files = {}; // reset file cache
@@ -771,8 +1077,8 @@ function GP_openBoardie() {
 			if (boardie.position &&
 				(boardie.position.x <= ideCnv.clientWidth - 45) &&
 				(boardie.position.y <= ideCnv.clientHeight - 45)) {
-					boardie.element.style.left = boardie.position.x + 'px';
-					boardie.element.style.top = boardie.position.y + 'px';
+				boardie.element.style.left = boardie.position.x + 'px';
+				boardie.element.style.top = boardie.position.y + 'px';
 			} else {
 				boardie.element.style.top = '70px';
 				boardie.element.style.right = '34px';
@@ -822,7 +1128,7 @@ function GP_openBoardie() {
 	req.send();
 };
 
-function makeDraggable (element) {
+function makeDraggable(element) {
 	// taken from w3schools (https://www.w3schools.com/howto/howto_js_draggable.asp)
 	var lastX = 0, lastY = 0;
 
@@ -878,7 +1184,7 @@ function makeDraggable (element) {
 	};
 };
 
-function focusDetection (elementSelector) {
+function focusDetection(elementSelector) {
 	document.addEventListener('click', (event) => {
 		var element = document.querySelector(elementSelector);
 		if (element) {
@@ -937,31 +1243,31 @@ async function webSerialConnect() {
 	// Prompt user to choose a serial port and open the one selected.
 
 	var vendorIDs = [
-		{ usbVendorId: 0x0403},		// FTDI
-		{ usbVendorId: 0x0d28},		// micro:bit, Calliope
-		{ usbVendorId: 0x10c4},		// Silicon Laboratories, Inc. (CP210x)
-		{ usbVendorId: 0x1a86},		// CH340
-		{ usbVendorId: 0x239a},		// AdaFruit
-		{ usbVendorId: 0x2a03},		// Arduino
-		{ usbVendorId: 0x2341},		// Arduino MKR Zero
-		{ usbVendorId: 0x03eb},		// Atmel Corporation
-		{ usbVendorId: 0x1366},		// SEGGER Calliope mini
-		{ usbVendorId: 0x16c0},		// Teensy
-		{ usbVendorId: 0x2e8a},		// Raspberry Pi Pico RP2040
-		{ usbVendorId: 0x303a},		// Espressif USB JTAG/serial debug unit
-		{ usbVendorId: 0x28e9},  	// GD32 USB CDC ACM
+		{ usbVendorId: 0x0403 },		// FTDI
+		{ usbVendorId: 0x0d28 },		// micro:bit, Calliope
+		{ usbVendorId: 0x10c4 },		// Silicon Laboratories, Inc. (CP210x)
+		{ usbVendorId: 0x1a86 },		// CH340
+		{ usbVendorId: 0x239a },		// AdaFruit
+		{ usbVendorId: 0x2a03 },		// Arduino
+		{ usbVendorId: 0x2341 },		// Arduino MKR Zero
+		{ usbVendorId: 0x03eb },		// Atmel Corporation
+		{ usbVendorId: 0x1366 },		// SEGGER Calliope mini
+		{ usbVendorId: 0x16c0 },		// Teensy
+		{ usbVendorId: 0x2e8a },		// Raspberry Pi Pico RP2040
+		{ usbVendorId: 0x303a },		// Espressif USB JTAG/serial debug unit
+		{ usbVendorId: 0x28e9 },  	// GD32 USB CDC ACM
 	];
 	webSerialDisconnect();
-	GP_webSerialPort = await navigator.serial.requestPort({filters: vendorIDs}).catch((e) => { console.log(e); });
+	GP_webSerialPort = await navigator.serial.requestPort({ filters: vendorIDs }).catch((e) => { console.log(e); });
 	if (!GP_webSerialPort) return; // no serial port selected
-	await GP_webSerialPort.open({ baudRate: 115200 }).catch((e) => { window.alert(e); return; });
+	await GP_webSerialPort.open({ baudRate: 115200 });
 	GP_webSerialReader = await GP_webSerialPort.readable.getReader();
 	webSerialReadLoop();
 }
 
 async function webSerialDisconnect() {
-	if (GP_webSerialReader) await GP_webSerialReader.cancel().catch(() => {});
-	if (GP_webSerialPort) await GP_webSerialPort.close().catch(() => {});
+	if (GP_webSerialReader) await GP_webSerialReader.cancel().catch(() => { });
+	if (GP_webSerialPort) await GP_webSerialPort.close().catch(() => { });
 	GP_webSerialReader = null;
 	GP_webSerialPort = null;
 }
@@ -980,7 +1286,7 @@ async function webSerialReadLoop() {
 		}
 	} catch (e) { // happens when board is unplugged
 		console.log(e);
-		await GP_webSerialPort.close().catch(() => {});
+		await GP_webSerialPort.close().catch(() => { });
 		GP_webSerialPort = null;
 		GP_webSerialReader = null;
 		console.log('Connection closed.');
@@ -1052,7 +1358,7 @@ function GP_openSerialPort(id, path, baud) {
 		webSerialConnect();
 	} else if (hasChromeSerial()) {
 		if (GP_serialPortID >= 0) return 1; // already open (not an error)
-		chrome.serial.connect(path, {bitrate: baud}, portOpened)
+		chrome.serial.connect(path, { bitrate: baud }, portOpened)
 	}
 	return 1; // connect is asynchronous, but assume it will succeed
 }
@@ -1127,9 +1433,9 @@ async function GP_setSerialPortDTR(flag) {
 		return; // do nothing
 	} else if (hasWebSerial()) {
 		if (!GP_webSerialPort) return; // port not open
-		await GP_webSerialPort.setSignals({ dtr: flag, dataTerminalReady: flag }).catch(() => {});
+		await GP_webSerialPort.setSignals({ dtr: flag, dataTerminalReady: flag }).catch(() => { });
 	} else if (hasChromeSerial()) {
-		function ignore(result) {}
+		function ignore(result) { }
 		flag = (flag) ? true : false;
 		chrome.serial.setControlSignals(GP_serialPortID, { dtr: flag }, ignore);
 	}
@@ -1140,9 +1446,9 @@ async function GP_setSerialPortRTS(flag) {
 		return; // do nothing
 	} else if (hasWebSerial()) {
 		if (!GP_webSerialPort) return; // port not open
-		await GP_webSerialPort.setSignals({ rts: flag, requestToSend: flag }).catch(() => {});
+		await GP_webSerialPort.setSignals({ rts: flag, requestToSend: flag }).catch(() => { });
 	} else if (hasChromeSerial()) {
-		function ignore(result) {}
+		function ignore(result) { }
 		flag = (flag) ? true : false;
 		chrome.serial.setControlSignals(GP_serialPortID, { rts: flag }, ignore);
 	}
@@ -1153,9 +1459,9 @@ async function GP_setSerialPortDTRandRTS(dtrFlag, rtsFlag) {
 		if (!GP_webSerialPort) return; // port not open
 		await GP_webSerialPort.setSignals(
 			{ dtr: dtrFlag, dataTerminalReady: dtrFlag, rts: rtsFlag, requestToSend: rtsFlag }
-		).catch(() => {});
+		).catch(() => { });
 	} else if (hasChromeSerial()) {
-		function ignore(result) {}
+		function ignore(result) { }
 		flag = (flag) ? true : false;
 		chrome.serial.setControlSignals(GP_serialPortID, { dtr: dtrFlag, rts: rtsFlag }, ignore);
 	}
@@ -1206,7 +1512,7 @@ class NimBLESerial {
 		await tx_char.startNotifications();
 		// bind overrides the default this=tx_char to this=the NimBLESerial
 		tx_char.addEventListener("characteristicvaluechanged", this.handle_read.bind(this));
- 		this.connected = true;
+		this.connected = true;
 		this.sendInProgress = false;
 		console.log("BLE connected");
 	}
@@ -1235,7 +1541,7 @@ class NimBLESerial {
 		let byteCount = (data.length > BLE_PACKET_LEN) ? BLE_PACKET_LEN : data.length;
 		this.async_write_data(data.subarray(0, byteCount));
 		return byteCount;
- 	}
+	}
 
 	async async_write_data(data) {
 		if (this.rx_char == undefined) return;
@@ -1250,10 +1556,11 @@ class NimBLESerial {
 	}
 }
 
+
 if (typeof window.Capacitor !== 'undefined') {
 	// trick to load capacitor ble
-	const _lazyloadSerial = function(){
-		if (window.CapacitorBLESerial){
+	const _lazyloadSerial = function () {
+		if (window.CapacitorBLESerial) {
 			window.bleSerial = new window.CapacitorBLESerial();
 		} else {
 			setTimeout(_lazyloadSerial, 1000)
@@ -1277,9 +1584,9 @@ async function GP_ReadFile(ext) {
 	function onFileSelected(entry) {
 		void chrome.runtime.lastError; // suppress error message
 		if (!entry) return; // no file selected
-		entry.file(function(file) {
+		entry.file(function (file) {
 			var reader = new FileReader();
-			reader.onload = function(evt) {
+			reader.onload = function (evt) {
 				GP.droppedFiles.push({ name: toUTF8Array(file.name), contents: evt.target.result });
 			};
 			reader.readAsArrayBuffer(file);
@@ -1293,12 +1600,13 @@ async function GP_ReadFile(ext) {
 			accepts: [{ description: 'MicroBlocks', extensions: [ext] }]
 		};
 		chrome.fileSystem.chooseEntry(options, onFileSelected);
-	} else if (GP_isMobile()) {
-		GP_UploadFiles();
 	} else if (typeof window.showOpenFilePicker != 'undefined') { // Native Filesystem API
 		var options = {};
 		if ('' != ext) {
-			options = { types: [{ description: 'MicroBlocks', accept: { 'text/plain': ['.' + ext] }}] };
+			options = {
+				type: 'openFile',
+				accepts: [{ description: 'All Files', extensions: ['*'] }]
+			};
 		}
 		const files = await window.showOpenFilePicker(options).catch((e) => { console.log(e); });
 		if (typeof files === 'undefined') { console.log('No file selected.'); return; }
@@ -1334,9 +1642,10 @@ async function GP_writeFile(data, fName, id) {
 
 	function onFileSelected(entry) {
 		void chrome.runtime.lastError; // suppress error message
-		if (entry) entry.createWriter(function(writer) {
+		if (entry) entry.createWriter(function (writer) {
 			GP.lastSavedFileName = entry.name;
-			writer.write(new Blob([data], {type: 'text/plain'})); });
+			writer.write(new Blob([data], { type: 'text/plain' }));
+		});
 	}
 
 	i = fName.lastIndexOf('.');
@@ -1345,8 +1654,71 @@ async function GP_writeFile(data, fName, id) {
 	i = fName.lastIndexOf('.');
 	if (i > 0) fName = fName.substr(0, i);
 	if (i == 0) fName = 'Untitled';
+	// 检测是否在 Capacitor 环境中
+	if (typeof window.Capacitor !== 'undefined' && window.Capacitor.isNativePlatform()) {
+		try {
+			const { Filesystem } = window.Capacitor.Plugins;
 
-	if (hasChromeFilesystem()) {
+			// 检测系统语言
+			const isChinese = navigator.language.toLowerCase().startsWith('zh');
+			const messages = {
+				inputPrompt: isChinese ? '请输入文件名：' : 'Enter file name:',
+				cancelSave: isChinese ? '用户取消保存' : 'User cancelled save',
+				folderCreated: isChinese ? '文件夹已创建或已存在' : 'Folder created or already exists',
+				saveSuccess: isChinese ? '文件已保存到 Documents/CoCube/' : 'File saved to Documents/CoCube/',
+				saveError: isChinese ? '保存文件失败: ' : 'Failed to save file: '
+			};
+
+			// 1. 让用户输入文件名
+			const userFileName = prompt(messages.inputPrompt, fName);
+			if (!userFileName) {
+				console.log(messages.cancelSave);
+				return;
+			}
+
+			const fileName = userFileName + '.' + ext;
+			const folderPath = 'CoCube';
+			const fullPath = folderPath + '/' + fileName;
+
+			// 2. 检查并创建 CoCube 文件夹
+			try {
+				await Filesystem.mkdir({
+					path: folderPath,
+					directory: 'DOCUMENTS',
+					recursive: true // 递归创建，如果已存在不会报错
+				});
+				console.log(messages.folderCreated);
+			} catch (mkdirError) {
+				// 文件夹可能已存在，继续执行
+				console.log('Folder operation:', mkdirError);
+			}
+
+			// 3. 转换数据格式
+			const dataToWrite = typeof data === 'string' ? data : btoa(String.fromCharCode(...new Uint8Array(data)));
+
+			// 4. 保存文件到 Documents/CoCube 目录
+			const writeOptions = {
+				path: fullPath,
+				data: dataToWrite,
+				directory: 'DOCUMENTS'
+			};
+			if (typeof data === 'string') {
+				writeOptions.encoding = 'utf8';
+			}
+
+			await Filesystem.writeFile(writeOptions);
+
+			GP.lastSavedFileName = fileName;
+			console.log('File saved to:', fullPath);
+			alert(messages.saveSuccess + fileName);
+
+		} catch (e) {
+			console.error('Error saving file:', e);
+			const isChinese = navigator.language.toLowerCase().startsWith('zh');
+			const errorMsg = isChinese ? '保存文件失败: ' : 'Failed to save file: ';
+			alert(errorMsg + e.message);
+		}
+	} else if (hasChromeFilesystem()) {
 		// extract the extension from fName
 		const options = {
 			type: 'saveFile',
@@ -1368,6 +1740,7 @@ async function GP_writeFile(data, fName, id) {
 				options.types = [{ accept: { 'text/plain': [ext] } }];
 			}
 		}
+		console.log('options', options);
 
 		const fileHandle = await window.showSaveFilePicker(options).catch((e) => { console.log(e); });
 		if (!fileHandle) {
@@ -1376,7 +1749,7 @@ async function GP_writeFile(data, fName, id) {
 		}
 		const writable = await fileHandle.createWritable();
 		await writable.write(new Blob([data]));
-		await writable.close().catch(() => {});
+		await writable.close().catch(() => { });
 		GP.lastSavedFileName = fileHandle.name;
 	} else {
 		saveAs(new Blob([data]), fName + '.' + ext);
@@ -1388,9 +1761,9 @@ async function GP_writeFile(data, fName, id) {
 function GP_ChromebookLaunch(bgPage) {
 	if (bgPage.launchFileEntry) {
 		var fName = bgPage.launchFileEntry.fullPath;
-		bgPage.launchFileEntry.file(function(file) {
+		bgPage.launchFileEntry.file(function (file) {
 			var reader = new FileReader();
-			reader.onload = function(evt) {
+			reader.onload = function (evt) {
 				GP.droppedFiles.push({ name: toUTF8Array(fName), contents: evt.target.result });
 			};
 			reader.readAsArrayBuffer(file);
@@ -1401,282 +1774,20 @@ function GP_ChromebookLaunch(bgPage) {
 if ((typeof chrome != 'undefined') &&
 	(typeof chrome.runtime != 'undefined') &&
 	(typeof chrome.runtime.getBackgroundPage != 'undefined')) {
-		chrome.runtime.getBackgroundPage(GP_ChromebookLaunch);
+	chrome.runtime.getBackgroundPage(GP_ChromebookLaunch);
 }
 
-// Floating Keyboard Input dialog for mobile browsers
-// Adapted from Zhongrui You's CoCube MicroBlocks app. Thanks!
+// warn before leaving page (only in web environment, not in Capacitor)
 
-function GP_isMobile() {
-	var isKindle = /Kindle|Silk|KFAPW|KFARWI|KFASWI|KFFOWI|KFJW|KFMEWI|KFOT|KFS‌​AW|KFSOWI|KFTBW|KFTH‌​W|KFTT|WFFOWI/i.test(navigator.userAgent);
-	var isOtherMobile = /Android|webOS|iPhone|iPad|iPod|CriOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-	return isKindle || isOtherMobile;
-}
-
-let GP_floatingContainer = null;
-let GP_floatingInput = null;
-let GP_isFloatingInputActive = false;
-
-// 创建浮动输入 UI
-function GP_createFloatingUI() {
-	if (GP_floatingContainer) return;
-
-	// 检测系统语言
-	const isChinese = navigator.language.toLowerCase().startsWith('zh');
-	const labels = {
-		placeholder: isChinese ? '请输入...' : 'Enter text...',
-		confirm: isChinese ? '确认' : 'Confirm',
-		cancel: isChinese ? '取消' : 'Cancel'
-	};
-
-	// 外层遮罩
-	const wrapper = document.createElement('div');
-	wrapper.id = 'floating-input-wrapper';
-	wrapper.style.cssText = `
-		position: fixed;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		background: rgba(0, 0, 0, 0.5);
-		z-index: 999999;
-		display: none;
-		align-items: center;
-		justify-content: center;
-	`;
-
-	// 输入框容器
-	const container = document.createElement('div');
-	container.style.cssText = `
-		background: white;
-		border-radius: 12px;
-		padding: 20px;
-		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-		min-width: 320px;
-		max-width: 90vw;
-		animation: slideUp 0.3s ease-out;
-	`;
-
-	// 输入框
-	const input = document.createElement('input');
-	input.type = 'text';
-	input.placeholder = labels.placeholder;
-	input.style.cssText = `
-		width: 100%;
-		padding: 12px 16px;
-		font-size: 16px;
-		border: 2px solid #e0e0e0;
-		border-radius: 8px;
-		box-sizing: border-box;
-		outline: none;
-		-webkit-appearance: none;
-	`;
-
-	// 按钮容器
-	const btnContainer = document.createElement('div');
-	btnContainer.style.cssText = `
-		display: flex;
-		gap: 12px;
-		margin-top: 16px;
-	`;
-
-	// 取消按钮
-	const cancelBtn = document.createElement('button');
-	cancelBtn.textContent = labels.cancel;
-	cancelBtn.style.cssText = `
-		flex: 1;
-		padding: 12px;
-		font-size: 16px;
-		background: #f5f5f5;
-		color: #666;
-		border: none;
-		border-radius: 8px;
-		font-weight: 500;
-		-webkit-tap-highlight-color: transparent;
-	`;
-
-	// 确认按钮
-	const confirmBtn = document.createElement('button');
-	confirmBtn.textContent = labels.confirm;
-	confirmBtn.style.cssText = `
-		flex: 1;
-		padding: 12px;
-		font-size: 16px;
-		background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
-		color: white;
-		border: none;
-		border-radius: 8px;
-		font-weight: 500;
-		-webkit-tap-highlight-color: transparent;
-	`;
-
-	// 添加动画
-	const style = document.createElement('style');
-	style.textContent = `
-		@keyframes slideUp {
-			from { opacity: 0; transform: translateY(30px); }
-			to { opacity: 1; transform: translateY(0); }
-		}
-	`;
-	document.head.appendChild(style);
-
-	// 组装 DOM
-	btnContainer.appendChild(cancelBtn);
-	btnContainer.appendChild(confirmBtn);
-	container.appendChild(input);
-	container.appendChild(btnContainer);
-	wrapper.appendChild(container);
-	document.body.appendChild(wrapper);
-
-	GP_floatingContainer = wrapper;
-	GP_floatingInput = input;
-
-	// 绑定事件
-	confirmBtn.onclick = () => GP_confirmFloatingInput();
-	cancelBtn.onclick = () => GP_cancelFloatingInput();
-
-	// 修复退格键问题 - 阻止事件冒泡
-	input.onkeydown = (e) => {
-		// 阻止事件冒泡到 document,避免被全局键盘处理器拦截
-		e.stopPropagation();
-
-		if (e.key === 'Enter') {
-			e.preventDefault();
-			GP_confirmFloatingInput();
-		}
-		if (e.key === 'Escape') {
-			e.preventDefault();
-			GP_cancelFloatingInput();
-		}
-		// 其他按键(包括退格)允许默认行为
-	};
-
-	// stop propagation of other keyboard input events
-	input.addEventListener('keypress', (e) => { e.stopPropagation() });
-	input.addEventListener('keyup', (e) => { e.stopPropagation() });
-	input.addEventListener('compositionstart', (e) => { e.stopPropagation() });
-	input.addEventListener('compositionupdate', (e) => { e.stopPropagation() });
-	input.addEventListener('compositionend', (e) => { e.stopPropagation() });
-
-	// 防止点击遮罩关闭
-	wrapper.onclick = (e) => {
-		if (e.target === wrapper) GP_cancelFloatingInput();
-	};
-
-	// 防止按钮事件冒泡
-	confirmBtn.onclick = (e) => {
-		e.stopPropagation();
-		GP_confirmFloatingInput();
-	};
-	cancelBtn.onclick = (e) => {
-		e.stopPropagation();
-		GP_cancelFloatingInput();
+if (!isCapacitorEnvironment()) {
+	window.onbeforeunload = function () {
+		return "Leave this page? (changes will be lost)";
 	};
 }
-
-// 显示浮动输入框
-function GP_showFloatingInput() {
-	if (!GP_isMobile()) return;
-	if (GP_isFloatingInputActive) return;
-
-	GP_createFloatingUI();
-
-	// 显示容器
-	GP_floatingContainer.style.display = 'flex';
-	if (!GP.defaultEditText) GP.defaultEditText = '';
-	GP_floatingInput.value = GP.defaultEditText;
-
-	// 标记为激活状态
-	GP_isFloatingInputActive = true;
-
-	// 延迟聚焦,确保键盘正确弹出
-	setTimeout(() => {
-		GP_floatingInput.focus();
-		GP_floatingInput.select();
-
-		// iOS 额外触发
-		if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-			GP_floatingInput.click();
-		}
-	}, 100);
-
-	// 阻止原生 clipboard 获得焦点
-	GP.clipboard.blur();
-}
-
-// 确认输入
-function GP_confirmFloatingInput() {
-	if (!GP_isFloatingInputActive) return;
-
-	const value = GP_floatingInput.value;
-
-	// 🔑 关键修改:完全覆盖,而非追加
-	// 1. 先清空原有内容(发送退格键删除所有字符)
-
-	const KEY_DOWN = 5;
-	const KEY_UP = 6;
-
-	// 方案1: 发送 Ctrl+A 全选 + Delete
-	// 模拟 Ctrl+A (全选)
-	GP.events.push([KEY_DOWN, 17, 0, 2]); // Ctrl down (keyCode=17, modifiers=2)
-	GP.events.push([KEY_DOWN, 65, 97, 2]); // A down (keyCode=65, charCode=97)
-	GP.events.push([KEY_UP, 65, 97, 2]);   // A up
-	GP.events.push([KEY_UP, 17, 0, 2]);    // Ctrl up
-
-	// 模拟 Delete/Backspace
-	GP.events.push([KEY_DOWN, 8, 8, 0]);   // Backspace down
-	GP.events.push([KEY_UP, 8, 8, 0]);     // Backspace up
-
-
-	// 2. 写入新内容
-	GP.clipboard.value = value;
-
-	// 3. 生成新内容的 textinput 事件
-	const TEXTINPUT = 7;
-	if (/Android/i.test(navigator.userAgent)) {
-		// Android 特殊处理
-		for (let i = 0; i < value.length; i++) {
-			GP.events.push([TEXTINPUT, value.charCodeAt(i)]);
-		}
-		if (value.length === 0) {
-			GP.events.push([TEXTINPUT, 13]); // 空字符串插入换行符
-		}
-	} else {
-		// 其他平台
-		for (let ch of value) {
-			GP.events.push([TEXTINPUT, ch.codePointAt(0)]);
-		}
-	}
-
-	GP_hideFloatingInput();
-}
-// 取消输入
-function GP_cancelFloatingInput() {
-	if (!GP_isFloatingInputActive) return;
-	GP_hideFloatingInput();
-}
-
-// 隐藏浮动输入框
-function GP_hideFloatingInput() {
-	if (!GP_floatingContainer) return;
-
-	GP_floatingContainer.style.display = 'none';
-	GP_floatingInput.blur();
-	GP_isFloatingInputActive = false;
-
-	// 将焦点返回给 canvas
-	document.getElementById('canvas').focus();
-}
-
-// warn before leaving page
-
-window.onbeforeunload = function() {
-	return "Leave this page? (changes will be lost)";
-};
 
 // progressive web app service worker
 
-window.onload = function() {
+window.onload = function () {
 	if (('serviceWorker' in navigator) && !hasChromeFilesystem()) {
 		navigator.serviceWorker.register('sw.js');
 	}
