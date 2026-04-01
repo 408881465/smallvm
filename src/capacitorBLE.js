@@ -1,6 +1,6 @@
 // TODO: implement in microblocks-app repo instead
 // capacitorBLE.js
-import { BleClient } from "@capacitor-community/bluetooth-le";
+// Access BluetoothLe plugin via window.Capacitor.Plugins (set by Capacitor native layer)
 import './css/capacitorBLE.css';
 
 const MICROBLOCKS_SERVICE_UUID = 'bb37a001-b922-4018-8e74-e14824b3a638'
@@ -19,9 +19,11 @@ class CapacitorBLESerial {
     }
 
     async initialize() {
-        // Get BleClient from Capacitor
-        this.bleClient = BleClient;
-        await this.bleClient.initialize();
+        // Get BleClient from Capacitor Plugins (registered by native layer)
+        this.bleClient = window.Capacitor.Plugins.BluetoothLe;
+        if (this.bleClient) {
+            await this.bleClient.initialize();
+        }
     }
 
 

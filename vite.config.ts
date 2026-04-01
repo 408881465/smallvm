@@ -1,5 +1,5 @@
 // Simple build script: copy static files from src/ to dist/
-// MicroBlocks IDE doesn't need bundling - it's a static web app
+// Capacitor will handle plugin registration via native layer
 
 import fs from 'fs';
 import path from 'path';
@@ -24,9 +24,13 @@ function copyDirRecursive(src, dest) {
   }
 }
 
-// Clean and copy
+console.log('Building MicroBlocks web app...');
+
 if (fs.existsSync(distDir)) {
   fs.rmSync(distDir, { recursive: true });
+  console.log('Cleaned dist/');
 }
+
 copyDirRecursive(srcDir, distDir);
+
 console.log('Build completed: src/ -> dist/');
