@@ -30,7 +30,13 @@ var filesToCache = [
 self.addEventListener('install', function(e) {
   e.waitUntil(
     caches.open(cacheName).then(function(cache) {
-      return cache.addAll(filesToCache);
+      return cache.addAll(filesToCache).catch(function(err) {
+        console.log("Service Worker cache failed (non-critical):", err);
+        return Promise.resolve();
+      });
+    }).catch(function(err) {
+      console.log("Service Worker install failed (non-critical):", err);
+      return Promise.resolve();
     })
   );
   self.skipWaiting(); // make this become the active service worker
@@ -40,11 +46,15 @@ self.addEventListener('install', function(e) {
 self.addEventListener('fetch', function(evt) {
   var isVersionCheck = (evt.request.url.indexOf("VERSION.txt") > -1);
   if (isVersionCheck) { // don't cache version checks
-	evt.respondWith(fetch(evt.request));
+	evt.respondWith(fetch(evt.request).catch(function() {
+      return new Response('', {status: 404, statusText: 'Not Found'});
+    }));
   	return;
   }
-  evt.respondWith(cachedFile(evt.request)); // use cached value
-  evt.waitUntil(updateCachedFile(evt.request)); // update the cache if online
+  evt.respondWith(cachedFile(evt.request).catch(function() {
+    return fetch(evt.request);
+  }));
+  evt.waitUntil(updateCachedFile(evt.request).catch(function() {}));
 });
 
 function cachedFile(request) {
