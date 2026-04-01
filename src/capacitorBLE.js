@@ -1,6 +1,6 @@
 // TODO: implement in microblocks-app repo instead
 // capacitorBLE.js
-// Access BluetoothLe plugin via window.Capacitor.Plugins (set by Capacitor native layer)
+import { BleClient } from "@capacitor-community/bluetooth-le";
 import './css/capacitorBLE.css';
 
 const MICROBLOCKS_SERVICE_UUID = 'bb37a001-b922-4018-8e74-e14824b3a638'
