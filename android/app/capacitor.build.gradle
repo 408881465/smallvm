@@ -9,7 +9,8 @@ android {
 
 apply from: "../capacitor-cordova-android-plugins/cordova.variables.gradle"
 dependencies {
-    implementation project(':capacitor-community-bluetooth-le')
+    // BLUETOOTH-LE DISABLED: incompatible with Gradle 9
+    // implementation project(':capacitor-community-bluetooth-le')
     implementation project(':capacitor-app')
     implementation project(':capacitor-camera')
     implementation project(':capacitor-filesystem')
