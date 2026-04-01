@@ -67,7 +67,7 @@ function showPromptDialog() {
   return new Promise((resolve) => {
     const locale = getLocale();
     const i18n = getI18nText(locale);
-    let selectedChoice = null;
+    let selectedChoice = 'no'; // 默认选择"其他设备"
 
     // 创建遮罩和弹窗
     const overlay = document.createElement('div');
@@ -241,6 +241,10 @@ function showPromptDialog() {
       }
     `;
     document.head.appendChild(style);
+
+    // 默认选中"其他设备"的视觉效果
+    otherOption.style.border = '3px solid #4a9eff';
+    otherOption.style.background = '#f0f8ff';
   });
 }
 
