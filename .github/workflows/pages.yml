@@ -21,13 +21,31 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Create index.html redirect
+        run: |
+          cat > index.html << 'EOF'
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta http-equiv="refresh" content="0;url=microblocks.html">
+            <title>Redirecting to MicroBlocks...</title>
+          </head>
+          <body>
+            <p>Redirecting to <a href="microblocks.html">MicroBlocks</a>...</p>
+          </body>
+          </html>
+          EOF
+
+      - name: Copy webapp files
+        run: cp -r chromeApp/webapp/* ./
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: 'chromeApp/webapp'
+          path: '.'
 
       - name: Deploy to GitHub Pages
         id: deployment
