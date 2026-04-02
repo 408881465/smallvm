@@ -249,36 +249,17 @@ function showPromptDialog() {
 }
 
 async function checkAndPromptCoCube() {
-  // 首先检查是否有永久存储的选择(勾选了"不再提示")
-  const storedChoice = getStoredChoice();
-  
-  if (storedChoice === 'yes' || storedChoice === 'no') {
-    // 用户已经做过选择并勾选了"不再提示",不再显示对话框
-    // 注意:不需要在这里处理 hash,因为 index.html 中的脚本已经根据 storedChoice 处理了
-    return;
+  // 直接选择"其他设备"，跳过选择对话框
+  setStoredChoice('no');
+  setSessionChoice('no');
+
+  // 如果有 hash 参数，清除并刷新
+  const hash = window.location.hash;
+  if (hash && hash.length > 1) {
+    window.location.hash = '';
+    window.location.reload();
   }
-  
-  // 检查本次会话是否已经做过选择(防止刷新后死循环)
-  const sessionChoice = getSessionChoice();
-  
-  if (sessionChoice === 'yes' || sessionChoice === 'no') {
-    // 本次会话已经选择过了,不再显示对话框
-    return;
-  }
-  
-  // 首次打开且本次会话未选择,显示提示对话框
-  const choice = await showPromptDialog();
-  
-  if (choice === 'no') {
-    // 用户选择不使用 CoCube，移除 hash 参数并刷新
-    // 检查是否有实际的 hash 内容(不只是 '#')
-    const hash = window.location.hash;
-    if (hash && hash.length > 1) {
-      window.location.hash = '';
-      window.location.reload();
-    }
-  }
-  // 如果选择 yes，已经有 hash 了，不需要额外操作
+  // 不再显示对话框
 }
 
 export { checkAndPromptCoCube };
